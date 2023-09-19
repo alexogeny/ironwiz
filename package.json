@@ -1,11 +1,19 @@
 {
   "name": "ironwiz",
+  "author": "alexogeny",
+  "license": "MIT",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
+    "@types/chrome": "^0.0.246",
+    "@types/firefox-webext-browser": "^111.0.2",
     "bun-types": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "watch": "bun build ./src/background/ts ./src/content.ts --outdir=dist --target=browser --watch",
+    "build": "bun build ./src/background/ts ./src/content.ts --outdir=dist --target=browser"
   }
 }

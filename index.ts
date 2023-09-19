@@ -1,1 +1,2 @@
-console.log("Hello via Bun!");
+import "./src/background";
+import "./src/content";
