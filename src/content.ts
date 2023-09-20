@@ -31,3 +31,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.notifications.create(message.options);
   }
 });
+
+const originalFetch = window.fetch;
+
+window.fetch = async (input: RequestInfo, init?: RequestInit) => {
+  const response = await originalFetch(input, init);
+
+  if (
+    typeof input === "string" &&
+    input.includes("/getUser") &&
+    init?.method === "GET"
+  ) {
+    const clone = response.clone(); // Clone the response so that it doesn't get consumed
+    const data = await clone.json();
+    const user = data.user;
+    const questReset = user.quests.reset;
+    console.debug(`Quest reset: ${questReset}`);
+  }
+
+  return response;
+};
