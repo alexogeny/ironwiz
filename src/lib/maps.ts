@@ -14,3 +14,23 @@ export const skillMap = {
   "13": "Farming",
   "14": "Ranged",
 };
+
+export const woodcuttingMap = {
+  "0": "Pine",
+  "1": "Spruce",
+  "2": "Birch",
+  "3": "Teak",
+  "4": "Mahogany",
+  "5": "Ironbark",
+  "6": "Redwood",
+};
+
+export const miningMap = {
+  "0": "Copper",
+  "1": "Iron",
+  "2": "Silver",
+  "3": "Gold",
+  "4": "Cobalt",
+  "5": "Obsidian",
+  "6": "Astral",
+};
