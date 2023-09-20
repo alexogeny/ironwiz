@@ -13,7 +13,7 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "watch": "bun build ./src/background/ts ./src/content.ts --outdir=dist --target=browser --watch",
-    "build": "bun build ./src/background/ts ./src/content.ts --outdir=dist --target=browser"
+    "watch": "bun build ./src/background.ts ./src/content.ts --outdir=dist --target=browser --watch",
+    "build": "bun build ./src/background.ts ./src/content.ts --outdir=dist --target=browser"
   }
 }
