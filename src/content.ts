@@ -16,7 +16,6 @@ const observer = new MutationObserver((mutations) => {
     addToTable();
   }
 });
-// Start observing changes to the body and its descendants
 observer.observe(document.body, {
   childList: true,
   subtree: true,

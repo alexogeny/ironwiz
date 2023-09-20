@@ -1,5 +1,4 @@
 export function addToTable() {
-  // The code for adding XP/min column will go here
   const rows = document.querySelectorAll(".row");
 
   if (rows.length > 0) {
