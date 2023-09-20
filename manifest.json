@@ -6,12 +6,14 @@
     "storage",
     "notifications",
     "webRequest",
+    "webRequestBlocking",
     "webNavigation",
-    "<all_urls>"
+    "*://ironwoodrpg.com/*",
+    "*://api.ironwoodrpg.com/*"
   ],
   "content_scripts": [
     {
-      "matches": ["*://ironwoodrpg.com/*"],
+      "matches": ["*://ironwoodrpg.com/*", "*://api.ironwoodrpg.com/*"],
       "js": ["dist/content.js"]
     }
   ],
