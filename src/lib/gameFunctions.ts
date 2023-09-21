@@ -16,6 +16,91 @@ function checkIfSkillTableHasXpPerMin() {
   }
 }
 
+function activeAction() {
+  const actionsComponent = getComponentFromDocument("actions-component");
+  if (actionsComponent) {
+    const activeAction = actionsComponent.querySelector(".active-link");
+    if (activeAction) {
+      const interval = activeAction.querySelector(".interval");
+      const exp = activeAction.querySelector(".exp");
+      return {
+        interval: parseFloat(interval?.textContent?.replace("s", "") || "0"),
+        exp: parseFloat(exp?.textContent?.replace(" XP", "") || "0"),
+      };
+    }
+  }
+  return { interval: 0, exp: 0 };
+}
+const safelyParseFloat = (str: string): number => {
+  const cleanedStr = str.replace(/[^\d.]/g, "");
+  return parseFloat(cleanedStr);
+};
+export function addTrackerDetails(triggeredByListener: boolean = false) {
+  const trackerComponent = document.querySelector("tracker-component");
+  if (!trackerComponent) {
+    return;
+  }
+  if (
+    trackerComponent.querySelector(".custom-tracker-details") &&
+    !triggeredByListener
+  ) {
+    return;
+  }
+  const { interval, exp } = activeAction();
+  if (interval === 0 || exp === 0) {
+    return;
+  }
+  const expElement = trackerComponent.querySelector(".exp");
+  if (!expElement) {
+    return;
+  }
+  const [currentXp, xpForNextLevel] = expElement?.textContent?.split(" / ") || [
+    "0",
+    "0",
+  ];
+  if (currentXp === "0" || xpForNextLevel === "0") {
+    return;
+  }
+  const xpRemaining =
+    safelyParseFloat(xpForNextLevel) - safelyParseFloat(currentXp);
+  const calculatedActionsRemaining = Math.ceil(xpRemaining / exp);
+  const calculatedTimeUntilLevelUp = calculatedActionsRemaining * interval;
+  const formattedTimeUntilLevelUp = new Date(calculatedTimeUntilLevelUp * 1000)
+    .toISOString()
+    .substr(11, 8);
+
+  const newRow = document.createElement("div");
+  newRow.classList.add("row");
+  newRow.classList.add("custom-tracker-details");
+  newRow.style.display = "flex"; // Add display: flex
+  newRow.style.justifyContent = "space-around"; // Add justify-content: space-around
+  newRow.style.paddingTop = "12px";
+  newRow.style.paddingBottom = "12px";
+  const actionsRemaining = document.createElement("div");
+  actionsRemaining.classList.add("actions-remaining");
+  actionsRemaining.textContent = `Actions Remaining: ${calculatedActionsRemaining}`; // Replace 'xyz' with the actual value
+  actionsRemaining.style.color = "#aaa"; // Change text color to #aaa
+
+  const timeUntilLevelUp = document.createElement("div");
+  timeUntilLevelUp.classList.add("time-until-level-up");
+  timeUntilLevelUp.textContent = `Time Until Level Up: ${formattedTimeUntilLevelUp}`; // Replace with the actual time
+  timeUntilLevelUp.style.color = "#aaa"; // Change text color to #aaa
+
+  newRow.appendChild(actionsRemaining);
+  newRow.appendChild(timeUntilLevelUp);
+
+  if (!triggeredByListener) {
+    trackerComponent.querySelector(".skill")?.appendChild(newRow);
+  } else {
+    trackerComponent
+      .querySelector(".skill")
+      ?.replaceChild(
+        newRow,
+        trackerComponent.querySelector(".custom-tracker-details")!
+      );
+  }
+}
+
 export function addXpPerMinToSkillTable() {
   if (checkIfSkillTableHasXpPerMin()) {
     return;
