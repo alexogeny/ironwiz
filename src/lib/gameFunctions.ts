@@ -1,5 +1,33 @@
-export function addToTable() {
-  const rows = document.querySelectorAll(".row");
+function getComponentFromDocument(componentName: string) {
+  const component = document.querySelector(componentName);
+  if (component) {
+    return component;
+  }
+  return null;
+}
+
+function checkIfSkillTableHasXpPerMin() {
+  // if the .xp-per-min class exists in the actions-component element then we know that the xp per min has already been added
+  const actionsComponent = getComponentFromDocument("actions-component");
+  if (actionsComponent) {
+    const xpPerMin = actionsComponent.querySelector(".xp-per-min");
+    if (xpPerMin) {
+      return true;
+    }
+  }
+}
+
+export function addXpPerMinToSkillTable() {
+  if (checkIfSkillTableHasXpPerMin()) {
+    return;
+  }
+
+  const actionsComponent = getComponentFromDocument("actions-component");
+  if (!actionsComponent) {
+    return;
+  }
+
+  const rows = actionsComponent.querySelectorAll(".row");
 
   if (rows.length > 0) {
     rows.forEach((row) => {

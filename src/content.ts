@@ -1,4 +1,4 @@
-import { addToTable } from "./lib/gameFunctions";
+import { addXpPerMinToSkillTable } from "./lib/gameFunctions";
 
 if (!window["myScriptHasRun"]) {
   console.log(
@@ -13,7 +13,7 @@ const observer = new MutationObserver((mutations) => {
   const currentURL = window.location.pathname;
   if (currentURL !== lastProcessedURL && currentURL.startsWith("/skill/")) {
     lastProcessedURL = currentURL;
-    addToTable();
+    addXpPerMinToSkillTable();
   }
 });
 observer.observe(document.body, {
