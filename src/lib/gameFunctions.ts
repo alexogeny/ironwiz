@@ -7,7 +7,6 @@ function getComponentFromDocument(componentName: string) {
 }
 
 function checkIfSkillTableHasXpPerMin() {
-  // if the .xp-per-min class exists in the actions-component element then we know that the xp per min has already been added
   const actionsComponent = getComponentFromDocument("actions-component");
   if (actionsComponent) {
     const xpPerMin = actionsComponent.querySelector(".xp-per-min");
@@ -31,25 +30,30 @@ export function addXpPerMinToSkillTable() {
 
   if (rows.length > 0) {
     rows.forEach((row) => {
-      const xpElement = row.querySelector(".exp");
+      let kindOfAction = "skilling";
+      let xpElement = row.querySelector(".exp");
+      if (!xpElement) {
+        xpElement = row.querySelector(".combat-exp");
+        kindOfAction = "combat";
+      }
       const timeElement = row.querySelector(".interval span");
       const levelElement = row.querySelector(".level");
 
-      if (xpElement && timeElement && levelElement) {
-        const xp = parseFloat(
-          xpElement?.textContent?.replace(" XP", "") || "0"
-        );
+      const xp = parseFloat(xpElement?.textContent?.replace(" XP", "") || "0");
+      let xpPerMin = null;
+      if (kindOfAction === "combat") {
+        xpPerMin = (xp * 60).toFixed(2);
+      } else {
         const time = parseFloat(
           timeElement?.textContent?.replace("s", "") || "0"
         );
-
-        const xpPerMin = ((xp / time) * 60).toFixed(2);
-
-        const newDiv = document.createElement("div");
-        newDiv.className = "xp-per-min";
-        newDiv.textContent = `${xpPerMin} XP/min`;
-        row.insertBefore(newDiv, levelElement);
+        xpPerMin = ((xp / time) * 60).toFixed(2);
       }
+
+      const newDiv = document.createElement("div");
+      newDiv.className = "xp-per-min";
+      newDiv.textContent = `${xpPerMin} XP/min`;
+      row.insertBefore(newDiv, levelElement);
     });
   }
 }

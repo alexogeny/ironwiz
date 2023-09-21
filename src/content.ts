@@ -10,11 +10,7 @@ if (!window["myScriptHasRun"]) {
 let lastProcessedURL: string = "";
 
 const observer = new MutationObserver((mutations) => {
-  const currentURL = window.location.pathname;
-  if (currentURL !== lastProcessedURL && currentURL.startsWith("/skill/")) {
-    lastProcessedURL = currentURL;
-    addXpPerMinToSkillTable();
-  }
+  addXpPerMinToSkillTable();
 });
 observer.observe(document.body, {
   childList: true,
