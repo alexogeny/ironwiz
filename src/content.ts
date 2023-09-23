@@ -75,6 +75,29 @@ const observer = new MutationObserver((mutations) => {
           document
             .getElementById("ironwiz-response")!
             .removeAttribute("data-current-skill");
+
+          const response = JSON.parse(responseBody!);
+          const {
+            charcoal,
+            compost,
+            coins,
+            inventory,
+            skills,
+            equipment,
+            home,
+          } = response;
+          // put these into localStorage under their own keys. charcoal, compost, and coins are just ints
+          localStorage.setItem("charcoal", charcoal);
+          localStorage.setItem("compost", compost);
+          localStorage.setItem("coins", coins);
+          localStorage.setItem("inventory", JSON.stringify(inventory));
+          localStorage.setItem("skills", JSON.stringify(skills));
+          localStorage.setItem("equipment", JSON.stringify(equipment));
+          localStorage.setItem("home", JSON.stringify(home));
+          const favicon = document.querySelector(
+            "link[rel*='icon']"
+          ) as HTMLLinkElement;
+          favicon.href = `/favicon/favicon-32x32.png`;
         } else if (!currentSkill && responseUrl?.includes("startAction")) {
           const detail = JSON.parse(responseBody!);
           const skillId = detail.skillId;
@@ -82,6 +105,12 @@ const observer = new MutationObserver((mutations) => {
           document
             .getElementById("ironwiz-response")!
             .setAttribute("data-current-skill", skillName);
+
+          // set the favicon to the matching asset png in the assets folder
+          const favicon = document.querySelector(
+            "link[rel*='icon']"
+          ) as HTMLLinkElement;
+          favicon.href = `/assets/misc/${skillName.toLowerCase()}.png`;
         }
       }
     }
