@@ -60,19 +60,30 @@ const setupNotificationForCraftCompletion = (document: Document) => {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "notification") {
     chrome.notifications.create(message.options);
-  }
-  if (message.action === "networkRequest") {
-    if (message.responseUrl.endsWith("/stopAction")) {
-      // parse message.responseBody as JSON to object
-      const response = JSON.parse(message.responseBody);
-    }
-    if (message.responseUrl.endsWith("/startAction")) {
-      const { skillId, actionId } = JSON.parse(message.responseBody);
-      // store the skill id and action id in chrome storage
-      chrome.storage.local.set({
-        skillId,
-        actionId,
+  } else if (message.action === "networkRequest") {
+    if (message.responseUrl.includes("stopAction")) {
+      chrome.notifications.create({
+        title: "IronWiz",
+        message: `Action Complete. At ${new Date().toLocaleString()}`,
+        iconUrl: "icon.png",
+        type: "basic",
       });
+    } else if (message.responseUrl.includes("startAction")) {
+      const detail = JSON.parse(message.responseBody);
+      const skillId = detail.skillId;
+      const actionId = detail.actionId;
+      let amount = null;
+      if (detail.amount) {
+        amount = detail.amount;
+      }
     }
+  } else if (message.action === "notifyActionComplete") {
+    const skillName = message.currentSkill;
+    chrome.notifications.create({
+      title: "IronWiz",
+      message: `Finished ${skillName}! At ${new Date().toLocaleString()}`,
+      iconUrl: "icon.png",
+      type: "basic",
+    });
   }
 });

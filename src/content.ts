@@ -1,13 +1,26 @@
+import { skillMap } from "./lib/gameInfo/i18n/skills";
 import { networkRequestScript } from "./lib/utilities/network";
 
 let ironWizLoaded = document.getElementById("ironwiz-loaded");
 let ironWizDataDiv = document.getElementById("ironwiz-response");
-if (!ironWizDataDiv) {
+if (!ironWizLoaded && !ironWizDataDiv) {
   const ironWizDataDiv = document.createElement("div");
   ironWizDataDiv.id = "ironwiz-response";
   ironWizDataDiv.style.display = "none";
   document.body.appendChild(ironWizDataDiv);
   ironWizDataDivCreated = true;
+
+  const welcomeBack = localStorage.getItem("welcomeBack");
+  if (welcomeBack) {
+    // parse wb as json
+    const welcomeBackJSON = JSON.parse(welcomeBack);
+    if (welcomeBackJSON.skillName) {
+      ironWizDataDiv.setAttribute(
+        "data-current-skill",
+        welcomeBackJSON.skillName
+      );
+    }
+  }
 
   const injectCSS = (cssString) => {
     const head = document.head || document.getElementsByTagName("head")[0];
@@ -52,22 +65,24 @@ const observer = new MutationObserver((mutations) => {
       if (mutation.target instanceof Element) {
         const responseBody = mutation.target.getAttribute("data-response");
         const responseUrl = mutation.target.getAttribute("data-response-url");
-        console.log(`responseBody: ${responseBody}`);
-        console.log(`responseUrl: ${responseUrl}`);
-        chrome.runtime.sendMessage(
-          {
-            action: "networkRequest",
-            responseBody,
-            responseUrl,
-          },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              console.error(chrome.runtime.lastError.message);
-            } else {
-              console.log("Message sent successfully", response);
-            }
-          }
-        );
+        const currentSkill = mutation.target.getAttribute("data-current-skill");
+        if (currentSkill && responseUrl?.includes("stopAction")) {
+          chrome.runtime.sendMessage({
+            action: "notifyActionComplete",
+            currentSkill,
+          });
+          // delete the current skill attribute
+          document
+            .getElementById("ironwiz-response")!
+            .removeAttribute("data-current-skill");
+        } else if (!currentSkill && responseUrl?.includes("startAction")) {
+          const detail = JSON.parse(responseBody!);
+          const skillId = detail.skillId;
+          const skillName = skillMap[skillId];
+          document
+            .getElementById("ironwiz-response")!
+            .setAttribute("data-current-skill", skillName);
+        }
       }
     }
   });
