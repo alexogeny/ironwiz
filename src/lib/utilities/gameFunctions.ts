@@ -165,3 +165,5 @@ export function addXpPerMinToSkillTable() {
     });
   }
 }
+
+const getTimeToCompleteAction = (amount?: number) => {};
