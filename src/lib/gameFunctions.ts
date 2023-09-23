@@ -61,10 +61,32 @@ export function addTrackerDetails(triggeredByListener: boolean = false) {
   if (currentXp === "0" || xpForNextLevel === "0") {
     return;
   }
+
+  const craftPercentElement = document
+    .querySelector("action-component")
+    ?.querySelector(".bar")
+    ?.querySelector(".fill");
+
+  const craftPercent =
+    craftPercentElement
+      ?.getAttribute("style")
+      ?.split("width: ")[1]
+      ?.split("%")[0] || "0";
+  const craftPercentFloat = safelyParseFloat(craftPercent);
+  const partialXpGained = (craftPercentFloat / 100) * exp;
+
   const xpRemaining =
-    safelyParseFloat(xpForNextLevel) - safelyParseFloat(currentXp);
-  const calculatedActionsRemaining = Math.ceil(xpRemaining / exp);
+    safelyParseFloat(xpForNextLevel) -
+    safelyParseFloat(currentXp) -
+    partialXpGained;
+  const calculatedActionsRemaining = xpRemaining / exp;
   const calculatedTimeUntilLevelUp = calculatedActionsRemaining * interval;
+  const formattedActionsRemaining = calculatedActionsRemaining.toLocaleString(
+    undefined,
+    {
+      maximumFractionDigits: 2,
+    }
+  );
   const formattedTimeUntilLevelUp = new Date(calculatedTimeUntilLevelUp * 1000)
     .toISOString()
     .substr(11, 8);
@@ -76,14 +98,15 @@ export function addTrackerDetails(triggeredByListener: boolean = false) {
   newRow.style.justifyContent = "space-around"; // Add justify-content: space-around
   newRow.style.paddingTop = "12px";
   newRow.style.paddingBottom = "12px";
+  newRow.style.fontFamily = "monospace";
   const actionsRemaining = document.createElement("div");
   actionsRemaining.classList.add("actions-remaining");
-  actionsRemaining.textContent = `Actions Remaining: ${calculatedActionsRemaining}`; // Replace 'xyz' with the actual value
+  actionsRemaining.textContent = `Actions: ${formattedActionsRemaining}`; // Replace 'xyz' with the actual value
   actionsRemaining.style.color = "#aaa"; // Change text color to #aaa
 
   const timeUntilLevelUp = document.createElement("div");
   timeUntilLevelUp.classList.add("time-until-level-up");
-  timeUntilLevelUp.textContent = `Time Until Level Up: ${formattedTimeUntilLevelUp}`; // Replace with the actual time
+  timeUntilLevelUp.textContent = `Time: ${formattedTimeUntilLevelUp}`; // Replace with the actual time
   timeUntilLevelUp.style.color = "#aaa"; // Change text color to #aaa
 
   newRow.appendChild(actionsRemaining);
