@@ -1,34 +1,52 @@
-import {
-  addTrackerDetails,
-  addXpPerMinToSkillTable,
-} from "./lib/gameFunctions";
+import { networkRequestScript } from "./lib/utilities/network";
 
-if (!window["myScriptHasRun"]) {
-  console.log(
-    "Loaded ironwiz extension for ironwoodRPG. Please report any bugs to https://github.com/alexogeny/ironwiz/issues/new"
-  );
-  window["myScriptHasRun"] = true;
+let ironWizDataDiv = document.getElementById("ironwiz-response");
+if (!ironWizDataDiv) {
+  const ironWizDataDiv = document.createElement("div");
+  ironWizDataDiv.id = "ironwiz-response";
+  ironWizDataDiv.style.display = "none";
+  document.body.appendChild(ironWizDataDiv);
 }
+ironWizDataDiv = document.getElementById("ironwiz-response");
+const injectScript = () => {
+  let script = document.createElement("script");
+  script.textContent = networkRequestScript;
+  (document.head || document.documentElement).appendChild(script);
+  script.remove();
+};
+injectScript();
 
-setInterval(() => {
-  addTrackerDetails(true);
-}, 1000);
+// setInterval(() => {
+//   addTrackerDetails(true);
+// }, 1000);
 const observer = new MutationObserver((mutations) => {
-  addXpPerMinToSkillTable();
-  addTrackerDetails();
+  // addXpPerMinToSkillTable();
+  // addTrackerDetails();
+  mutations.forEach(function (mutation) {
+    if (mutation.type === "attributes") {
+      if (mutation.target instanceof Element) {
+        const responseBody = mutation.target.getAttribute("data-response");
+        const responseUrl = mutation.target.getAttribute("data-response-url");
+        console.log(`responseBody: ${responseBody}`);
+        console.log(`responseUrl: ${responseUrl}`);
+        chrome.runtime.sendMessage(
+          {
+            action: "networkRequest",
+            responseBody,
+            responseUrl,
+          },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              console.error(chrome.runtime.lastError.message);
+            } else {
+              console.log("Message sent successfully", response);
+            }
+          }
+        );
+      }
+    }
+  });
 });
-observer.observe(document.body, {
-  childList: true,
-  subtree: true,
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getDocumentHTML") {
-    const documentHTML = document.documentElement.outerHTML;
-    sendResponse({ documentHTML });
-  }
-
-  if (message.action === "notification") {
-    chrome.notifications.create(message.options);
-  }
+observer.observe(ironWizDataDiv!, {
+  attributes: true,
 });

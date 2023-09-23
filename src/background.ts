@@ -57,71 +57,12 @@ const setupNotificationForCraftCompletion = (document: Document) => {
   }, totalTime);
 };
 
-const getDomAndSetupNotification = () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    if (activeTab.id) {
-      chrome.tabs.sendMessage(
-        activeTab.id,
-        { action: "getDocumentHTML" },
-        (response) => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(
-            response.documentHTML,
-            "text/html"
-          );
-          setTimeout(() => {
-            setupNotificationForCraftCompletion(doc);
-          }, 2500);
-        }
-      );
-    }
-  });
-};
-
-chrome.webRequest.onBeforeRequest.addListener(
-  (details) => {
-    if (details.method === "POST" && details.url.includes("/startAction")) {
-      if (
-        details.requestBody &&
-        details.requestBody.raw &&
-        details.requestBody.raw[0]
-      ) {
-        const enc = new TextDecoder("utf-8");
-        const requestBody = JSON.parse(
-          enc.decode(details.requestBody.raw[0].bytes)
-        );
-
-        if (!("amount" in requestBody)) {
-          console.debug(
-            'Doing nothing because "amount" key is not present in the request body'
-          );
-          return;
-        }
-
-        setTimeout(() => {
-          getDomAndSetupNotification();
-        }, 500);
-      }
-    }
-  },
-  { urls: ["*://ironwoodrpg.com/*", "*://api.ironwoodrpg.com/*"] },
-  ["requestBody"]
-);
-
-chrome.storage.onChanged.addListener((changes, namespace) => {
-  // Handle local storage changes
-});
-
-chrome.notifications.create({
-  type: "basic",
-  iconUrl: "icon.png",
-  title: "Ironwood",
-  message: `Loaded extension. Current version: ${version}`,
-});
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "notification") {
+  if (message.action === "notification") {
     chrome.notifications.create(message.options);
+  }
+  if (message.action === "networkRequest") {
+    console.log("networkRequest");
+    console.log(message);
   }
 });
