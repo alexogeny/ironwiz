@@ -1,5 +1,5 @@
 // a map of the skill number strings e.g. "1" => "Woodcutting"
-export const skillMap = {
+export const skillMap: Record<string, string> = {
   "1": "Woodcutting",
   "2": "Mining",
   "3": "Smelting",

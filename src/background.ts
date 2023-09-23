@@ -62,7 +62,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     chrome.notifications.create(message.options);
   }
   if (message.action === "networkRequest") {
-    console.log("networkRequest");
-    console.log(message);
+    if (message.responseUrl.endsWith("/stopAction")) {
+      // parse message.responseBody as JSON to object
+      const response = JSON.parse(message.responseBody);
+    }
+    if (message.responseUrl.endsWith("/startAction")) {
+      const { skillId, actionId } = JSON.parse(message.responseBody);
+      // store the skill id and action id in chrome storage
+      chrome.storage.local.set({
+        skillId,
+        actionId,
+      });
+    }
   }
 });
