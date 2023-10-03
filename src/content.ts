@@ -42,6 +42,27 @@ if (!ironWizLoaded && !ironWizDataDiv) {
       to { opacity: 0; }
     }
   `);
+
+  injectCSS(`
+    actions-component > .card > .row, action-drops-component > .drops .item {
+      padding: 8px 12px !important;
+    }
+    actions-component > .card > .row > .image, action-drops-component > .drops > .item > .image {
+      width: 24px !important;
+      min-width: 24px !important;
+      height: 24px !important;
+    }
+    body > app-component > nav-component > .nav > .scroll > button[type="button"] {
+      height: 40px !important;
+      padding: 4px 24px !important;
+    }
+    body > app-component > nav-component > .nav > .scroll > button[type="button"] > .image,
+    body > app-component > nav-component > .nav > .scroll > button[type="button"] > img {
+      height: 24px !important;
+      width: 24px !important;
+      min-width: 24px !important;
+    }
+  `);
 }
 ironWizDataDiv = document.getElementById("ironwiz-response");
 const injectScript = () => {
